@@ -8,4 +8,8 @@ var apiService = builder.AddProject<Projects.ShoppingList_Service>("apiservice")
     .WaitFor(mongodb)
     .WithReference(mongodb);
 
+var webApp = builder.AddViteApp("webapp", "../ShoppingList.Client", "pnpm")
+    .WithPnpmPackageInstallation()
+    .WaitFor(apiService);
+
 builder.Build().Run();

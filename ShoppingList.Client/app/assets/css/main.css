@@ -1,0 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Twinkle+Star&display=swap');
+
+@import 'tailwindcss';
+@plugin "daisyui" {
+  themes:
+    valentine --default,
+    coffee --prefersdark;
+}
+
+@theme {
+  --font-twinkle-star: 'Twinkle Star', sans-serif;
+}
