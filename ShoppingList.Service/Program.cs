@@ -1,63 +1,49 @@
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.HttpLogging;
+using MongoDB.Driver;
 using ShoppingList.Core.Domain.Entities;
 using ShoppingList.Core.Domain.RepositoryContracts;
-using ShoppingList.Core.Mappings;
 using ShoppingList.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 builder.Services.AddProblemDetails();
+builder.Services.AddHttpLogging(logging =>
+{
+    logging.LoggingFields = HttpLoggingFields.RequestProperties
+        | HttpLoggingFields.ResponsePropertiesAndHeaders;
+});
 
 builder.AddMongoDBClient("mongodb");
 builder.Services.AddItemRepository("items");
+builder.Services.AddScoped<IRepository<Item>>(
+    sp => new MongoRepository<Item>(sp.GetRequiredService<IMongoDatabase>(), "items"));
+builder.Services.AddControllers(options => options.SuppressAsyncSuffixInActionNames = false);
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// builder.Services.AddOpenApi();
 
 var app = builder.Build();
-
-using (var scope = app.Services.CreateScope())
-{
-    var itemRepository = scope.ServiceProvider.GetRequiredService<IRepository<Item>>();
-
-    var collection = await itemRepository.GetAllAsync();
-
-    // Check if data exists
-    if (collection.Count == 0)
-    {
-        var items = new List<Item>();
-
-        foreach (var index in Enumerable.Range(1, 5))
-        {
-            await itemRepository.InsertAsync(new Item
-            {
-                Id = Guid.NewGuid(),
-                Name = $"Item{index}",
-                Description = $"Description for item {index}",
-                Price = Random.Shared.Next(0, 55),
-                Status = ItemStatus.NotPurchased
-            });
-        }
-    }
-}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    // app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
+        c.RoutePrefix = "swagger";
+    });
+
+    app.UseCors(b => b.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 }
 
+app.UseHttpLogging();
 app.UseHttpsRedirection();
 
-
-app.MapGet("/items", async ([FromServices] IRepository<Item> repository) =>
-{
-    var items = await repository.GetAllAsync();
-    return items.Select(i => i.ToDto()).ToArray();
-}).WithName("GetItems");
-
+app.MapControllers();
 app.MapDefaultEndpoints();
 
 app.Run();

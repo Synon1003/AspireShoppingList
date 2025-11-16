@@ -1,7 +1,6 @@
 ﻿using MongoDB.Driver;
 using ShoppingList.Core.Domain.Entities;
 using ShoppingList.Core.Domain.RepositoryContracts;
-using System.Security.Principal;
 
 namespace ShoppingList.Infrastructure.Repositories;
 
