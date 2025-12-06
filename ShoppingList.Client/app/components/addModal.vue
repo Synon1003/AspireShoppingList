@@ -1,10 +1,10 @@
 <template>
   <div class="flex">
-    <button class="btn btn-primary btn-sm uppercase" onclick="addItemModal.showModal()">Új termék</button>
+    <button class="btn btn-primary btn-sm uppercase" onclick="addItemModal.showModal()">New Item</button>
 
     <dialog id="addItemModal" class="modal" @close="resetForm">
       <div class="modal-box">
-        <h3 class="font-bold text-lg mb-4">Új termék</h3>
+        <h3 class="font-bold text-lg mb-4">New Item</h3>
 
         <form @submit.prevent="submitForm" class="space-y-4">
           <div>

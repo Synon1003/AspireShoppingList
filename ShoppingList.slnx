@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="ShoppingList.AppHost/ShoppingList.AppHost.csproj" />
+  <Project Path="ShoppingList.Client.Tests/ShoppingList.Client.Tests.csproj" />
   <Project Path="ShoppingList.Core/ShoppingList.Core.csproj" />
   <Project Path="ShoppingList.Infrastructure/ShoppingList.Infrastructure.csproj" />
   <Project Path="ShoppingList.Service.Tests/ShoppingList.Service.Tests.csproj" />

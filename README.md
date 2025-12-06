@@ -13,8 +13,13 @@ dotnet run
 - Aspire orchestration
 
 ### Tests
-Integration of WebApi + MongoDB
+Integration (WebApi + MongoDB)
 ```bash
 cd .\ShoppingList.Service.Tests
 dotnet test
+```
+E2e (Client + WebApi + MongoDB)
+```bash
+cd .\ShoppingList.Client.Tests
+dotnet test --settings ShoppingList.Client.runsettings
 ```

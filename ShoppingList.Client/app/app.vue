@@ -1,6 +1,6 @@
 <template>
   <div class="max-w-4xl mx-auto px-4 py-10">
-    <Header text="ShoppingList" />
+    <Header text="Shopping List" />
 
     <div class="flex items-center justify-between mb-4">
       <CountIndicator :totalCount="totalCount" />
