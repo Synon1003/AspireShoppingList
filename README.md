@@ -18,6 +18,11 @@ Integration (WebApi + MongoDB)
 cd .\ShoppingList.Service.Tests
 dotnet test
 ```
+Vue components (Client components)
+```bash
+cd .\ShoppingList.Client
+pnpm run test
+```
 E2e (Client + WebApi + MongoDB)
 ```bash
 cd .\ShoppingList.Client.Tests

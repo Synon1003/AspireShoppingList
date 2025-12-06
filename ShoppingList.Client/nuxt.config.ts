@@ -12,4 +12,7 @@ export default defineNuxtConfig({
       tailwindcss(),
     ],
   },
+  modules: [
+    '@nuxt/test-utils/module',
+  ],
 })

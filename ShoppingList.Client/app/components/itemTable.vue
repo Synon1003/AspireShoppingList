@@ -16,7 +16,7 @@
         <td style="word-break: break-word; max-width: 150px;">{{ item.name }}</td>
         <td style="word-break: break-word; max-width: 250px;">{{ item.description }}</td>
         <td>{{ item.price }}</td>
-        <td>{{ new Date(item.updatedAt).toLocaleString() }}</td>
+        <td>{{ new Date(item.updatedAt).toLocaleString('hu-HU', { timeZone: 'UTC' }) }}</td>
         <td class="px-4 py-2 text-sm text-primary">
           <div class="flex gap-2">
             <button
