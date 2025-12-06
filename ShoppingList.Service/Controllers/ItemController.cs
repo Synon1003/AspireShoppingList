@@ -97,5 +97,33 @@ namespace ShoppingList.Service.Controllers
 
             return NoContent();
         }
+
+        [HttpPost("initialize")]
+        public async Task<IActionResult> InitializeAsync([FromBody] IReadOnlyCollection<CreateItemDto> itemsDto)
+        {
+            var items = itemsDto.Select(dto => new Item
+            {
+                Id = Guid.NewGuid(),
+                Name = dto.Name,
+                Description = dto.Description,
+                Price = dto.Price,
+                Status = ItemStatus.NotPurchased,
+                UpdatedAt = DateTime.UtcNow,
+            }).ToList();
+
+            await _repository.InitializeAsync(items);
+            _logger.LogInformation("Created {Count} items", items.Count);
+
+            return NoContent();
+        }
+
+        [HttpDelete("clear")]
+        public async Task<IActionResult> ClearAsync()
+        {
+            await _repository.ClearAsync();
+            _logger.LogInformation("Deleted all items");
+
+            return NoContent();
+        }
     }
 }

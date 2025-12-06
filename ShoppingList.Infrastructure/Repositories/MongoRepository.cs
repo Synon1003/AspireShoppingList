@@ -58,4 +58,16 @@ public class MongoRepository<T> : IRepository<T> where T : IEntity
         FilterDefinition<T> filter = _filterBuilder.Eq(entity => entity.Id, id);
         await _dbCollection.DeleteOneAsync(filter);
     }
+
+    public async Task InitializeAsync(IReadOnlyCollection<T> initialData)
+    {
+        long existingCount = await _dbCollection.CountDocumentsAsync(_filterBuilder.Empty);
+        if (existingCount == 0)
+            await _dbCollection.InsertManyAsync(initialData);
+    }
+
+    public async Task ClearAsync()
+    {
+        await _dbCollection.DeleteManyAsync(_filterBuilder.Empty);
+    }
 }

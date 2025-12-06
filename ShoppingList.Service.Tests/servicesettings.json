@@ -1,0 +1,6 @@
+{
+    "ServiceSettings": {
+        "BaseUrl": "https://localhost:7065/",
+        "ItemsPath": "items"
+    }
+}

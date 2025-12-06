@@ -10,4 +10,7 @@ public interface IRepository<T> where T : IEntity
     Task InsertAsync(T entity);
     Task UpdateAsync(T entity);
     Task RemoveAsync(Guid id);
+    Task InitializeAsync(IReadOnlyCollection<T> entities);
+    Task ClearAsync();
+
 }
