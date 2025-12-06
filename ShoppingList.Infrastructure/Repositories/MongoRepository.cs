@@ -19,7 +19,7 @@ public class MongoRepository<T> : IRepository<T> where T : IEntity
         return await _dbCollection.Find(_filterBuilder.Empty).ToListAsync();
     }
 
-    public async Task<T> GetByIdAsync(Guid id)
+    public async Task<T?> GetByIdAsync(Guid id)
     {
         FilterDefinition<T> filter = _filterBuilder.Eq(entity => entity.Id, id);
         return await _dbCollection.Find(filter).FirstOrDefaultAsync();
