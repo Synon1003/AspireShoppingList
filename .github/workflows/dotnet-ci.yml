@@ -1,0 +1,104 @@
+name: CI - Build & Test (Aspire)
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  NODE_VERSION: '24'
+
+jobs:
+  build-and-run-unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: 🛠️ Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: ⚙️ Setup and Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+          run_install: false
+
+      - name: 📦 Restore Dependencies (.NET)
+        run: dotnet restore ShoppingList.slnx
+
+      - name: 🏗️ Build All Projects
+        run: dotnet build --configuration Release --no-restore
+
+      - name: ✅ Run .NET Unit Tests (WebApi Controllers)
+        run: dotnet test --no-build
+        working-directory: ./ShoppingList.Service.UnitTests
+
+      - name: 📦 Restore Dependencies (Nuxt)
+        run: pnpm install --frozen-lockfile
+        working-directory: ./ShoppingList.Client
+        
+      - name: ✅ Run Vue Component Tests (Nuxt/Vitest)
+        run: pnpm run test
+        working-directory: ./ShoppingList.Client
+
+  aspire-tests:
+    runs-on: ubuntu-latest
+    needs: build-and-run-unit-tests
+    
+    steps:
+      - name: ⬇️ Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: 🚀 Start Aspire AppHost (Background Process)
+        run: |
+          cd ./ShoppingList.AppHost
+          dotnet run &
+        env:
+          ASPNETCORE_ENVIRONMENT: Development 
+          
+      - name: ⏳ Wait for AppHost Services to be Ready
+        timeout-minutes: 5
+        run: |
+          # Wait 10 seconds initially for the AppHost process to start
+          sleep 10
+          HEALTH_URL="http://localhost:7065/health"
+          
+          echo "Waiting for WebAPI at $HEALTH_URL..."
+          for i in {1..30}; do
+            if curl --fail $HEALTH_URL; then
+              echo "WebAPI is ready!"
+              break
+            fi
+            sleep 5
+            if [ $i -eq 30 ]; then
+              echo "WebAPI failed to start in time."
+              exit 1
+            fi
+          done
+
+      - name: 🧪 Run .NET Integration Tests
+        run: dotnet test --configuration Release
+        working-directory: ./ShoppingList.Service.Tests
+
+      - name: 🌐 Run E2E Tests
+        run: dotnet test --settings ShoppingList.Client.runsettings --configuration Release
+        working-directory: ./ShoppingList.Client.Tests
